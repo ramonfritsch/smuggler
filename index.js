@@ -22,19 +22,19 @@ function checkConditions(conditions, context) {
 
 var Smuggler = function () {
 	return function (req, res, next) {
-		console.log('events', res._events);
-
-		if (!res._events) {
+		if (res.smuggler) {
 			return next();
 		}
 
-		res._events = {
-			init: [],
-			query: [],
-			action: [],
-			render: [],
-			send: [],
-			error: []
+		res.smuggler = {
+			events: {
+				init: [],
+				query: [],
+				action: [],
+				render: [],
+				send: [],
+				error: []
+			}
 		};
 
 		res.on = function (on) {
@@ -64,11 +64,11 @@ var Smuggler = function () {
 
 			if (typeof on == 'function') {
 				if (on()) {
-					res._events.action.push(fn);
+					res.smuggler.events.action.push(fn);
 				}
 			} else if (_.isObject(on)) {
 				if (checkConditions(on, req)) {
-					res._events.action.push(fn);
+					res.smuggler.events.action.push(fn);
 				}
 			} else if (on == 'get' || on == 'post' || on == 'put' || on == 'delete') {
 				if (req.method.toLowerCase() != on) {
@@ -92,9 +92,9 @@ var Smuggler = function () {
 					}
 				}
 
-				res._events.action.push(fn);
+				res.smuggler.events.action.push(fn);
 			} else if (on == 'init' || on == 'render' || on == 'send' || on == 'error') {
-				res._events[on].push(fn);
+				res.smuggler.events[on].push(fn);
 			}
 
 			return this;
@@ -106,12 +106,12 @@ var Smuggler = function () {
 				callback = view;
 			}
 
-			var queue = res._events.init.concat(res._events.query).concat(res._events.action);
-			queue.push(res._events.render);
+			var queue = res.smuggler.events.init.concat(res.smuggler.events.query).concat(res.smuggler.events.action);
+			queue.push(res.smuggler.events.render);
 
 			runEvents(queue, function (err) {
 				if (err && err != 'ignore') {
-					runEvents(res._events.error, function (err2) {
+					runEvents(res.smuggler.events.error, function (err2) {
 						callback(err2 || err);
 					});
 
@@ -142,7 +142,7 @@ var Smuggler = function () {
 		res.send = function () {
 			var args = arguments;
 
-			runEvents(res._events.send, function (err) {
+			runEvents(res.smuggler.events.send, function (err) {
 				if (err) {
 					throw err;
 				}
