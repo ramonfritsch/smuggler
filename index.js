@@ -37,7 +37,7 @@ var Smuggler = function () {
 			}
 		};
 
-		res.on = function (on) {
+		res.on = function (type) {
 			var args = _.toArray(arguments);
 			var callback = args[1];
 			var fn;
@@ -62,17 +62,17 @@ var Smuggler = function () {
 				};
 			}
 
-			if (typeof on == 'function') {
-				if (on()) {
+			if (typeof type == 'function') {
+				if (type()) {
 					res.smuggler.events.action.push(fn);
 				}
-			} else if (_.isObject(on)) {
-				if (checkConditions(on, req)) {
+			} else if (_.isObject(type)) {
+				if (checkConditions(type, req)) {
 					res.smuggler.events.action.push(fn);
 				}
-			} else if (on == 'get' || on == 'post' || on == 'put' || on == 'delete') {
-				if (req.method.toLowerCase() != on) {
-					return this;
+			} else if (type == 'get' || type == 'post' || type == 'put' || type == 'delete') {
+				if (req.method.toLowerCase() != type) {
+					return res;
 				}
 
 				if (args.length >= 3) {
@@ -85,19 +85,19 @@ var Smuggler = function () {
 						conditions = args[1];
 					}
 
-					var context = (on == 'post' || on == 'put') ? req.body : req.query;
+					var context = (type == 'post' || type == 'put') ? req.body : req.query;
 
 					if (!checkConditions(conditions, context)) {
-						return this;
+						return res;
 					}
 				}
 
 				res.smuggler.events.action.push(fn);
-			} else if (on == 'init' || on == 'render' || on == 'send' || on == 'error') {
-				res.smuggler.events[on].push(fn);
+			} else if (type == 'init' || type == 'render' || type == 'send' || type == 'error') {
+				res.smuggler.events[type].push(fn);
 			}
 
-			return this;
+			return res;
 		};
 
 		var originalRender = res.render.bind(res);
@@ -163,7 +163,8 @@ Smuggler.asJson = function (req, res, next) {
 };
 
 Smuggler.asJsonIfAccepts = function (req, res, next) {
-	if (req.headers.accept && req.headers.accept.indexOf('application/json') > -1) {
+	var accept = res.get('accept');
+	if (accept && accept.indexOf('application/json') > -1) {
 		return Smuggler.asJson(req, res, next);
 	}
 
