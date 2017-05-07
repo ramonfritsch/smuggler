@@ -163,7 +163,7 @@ Smuggler.asJson = function (req, res, next) {
 };
 
 Smuggler.asJsonIfAccepts = function (req, res, next) {
-	var accept = res.get('accept');
+	var accept = req.get('accept');
 	if (accept && accept.indexOf('application/json') > -1) {
 		return Smuggler.asJson(req, res, next);
 	}
