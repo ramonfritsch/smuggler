@@ -100,6 +100,13 @@ var Smuggler = function () {
 			return res;
 		};
 
+		var originalRedirect = res.redirect.bind(res);
+		res.redirect = function (targetURL, next) {
+			res.data.redirect = targetURL;
+
+			return res.render(next);
+		};
+
 		var originalRender = res.render.bind(res);
 		res.render = function (view, callback) {
 			if (typeof view == 'function') {
@@ -119,7 +126,7 @@ var Smuggler = function () {
 				}
 
 				if (!req.isJson && res.data.redirect) {
-					res.redirect(res.data.redirect);
+					originalRedirect(res.data.redirect);
 				} else if (!req.isJson && typeof view == 'string') {
 					res.locals = _.extend(res.locals, res.data);
 
