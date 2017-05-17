@@ -104,7 +104,7 @@ var Smuggler = function () {
 		res.redirect = function (targetURL, next) {
 			res.data.redirect = targetURL;
 
-			return res.render(next);
+			return res._render(next);
 		};
 
 		var originalRender = res.render.bind(res);
@@ -125,23 +125,7 @@ var Smuggler = function () {
 					return;
 				}
 
-				if (!req.isJson && res.data.redirect) {
-					originalRedirect(res.data.redirect);
-				} else if (!req.isJson && typeof view == 'string') {
-					res.locals = _.extend(res.locals, res.data);
-
-					if (res.layout) {
-						res.locals.layout = res.layout;
-					}
-
-					originalRender(view, res.locals);
-				} else {
-					res.data = _.extend({
-						success: true
-					}, res.data);
-
-					res.json(res.data);
-				}
+				res._render.apply(res, arguments);
 			});
 		};
 
@@ -157,6 +141,30 @@ var Smuggler = function () {
 				originalSend.apply(res, args);
 			});
 		};
+
+		res._render = function (view, callback) {
+			if (typeof view == 'function') {
+				callback = view;
+			}
+
+			if (!req.isJson && res.data.redirect) {
+				originalRedirect(res.data.redirect);
+			} else if (!req.isJson && typeof view == 'string') {
+				res.locals = _.extend(res.locals, res.data);
+
+				if (res.layout) {
+					res.locals.layout = res.layout;
+				}
+
+				originalRender(view, res.locals);
+			} else {
+				res.data = _.extend({
+					success: true
+				}, res.data);
+
+				res.json(res.data);
+			}
+		}
 
 		next();
 	};
