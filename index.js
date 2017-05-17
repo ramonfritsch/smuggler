@@ -104,13 +104,14 @@ var Smuggler = function () {
 		res.redirect = function (targetURL, next) {
 			res.data.redirect = targetURL;
 
-			return res._render(next);
+			return res._render(null, next);
 		};
 
 		var originalRender = res.render.bind(res);
 		res.render = function (view, callback) {
 			if (typeof view == 'function') {
 				callback = view;
+				view = null;
 			}
 
 			var queue = res.smuggler.events.init.concat(res.smuggler.events.query).concat(res.smuggler.events.action);
@@ -125,7 +126,7 @@ var Smuggler = function () {
 					return;
 				}
 
-				res._render.apply(res, arguments);
+				res._render(view, callback);
 			});
 		};
 
@@ -143,10 +144,6 @@ var Smuggler = function () {
 		};
 
 		res._render = function (view, callback) {
-			if (typeof view == 'function') {
-				callback = view;
-			}
-
 			if (!req.isJson && res.data.redirect) {
 				originalRedirect(res.data.redirect);
 			} else if (!req.isJson && typeof view == 'string') {
