@@ -1,6 +1,6 @@
 {
   "name": "smuggler",
-  "version": "0.0.6",
+  "version": "0.1",
   "description": "expressjs route helpers",
   "main": "index.js",
   "scripts": {
