@@ -26,6 +26,8 @@ var Smuggler = function () {
 			return next();
 		}
 
+		res.data = {};
+
 		res.smuggler = {
 			events: {
 				init: [],
