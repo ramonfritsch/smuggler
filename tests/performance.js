@@ -14,6 +14,9 @@ async.eachLimit(requests, 1, function (num, cb) {
 		render: function (view, locals) {
 			this.send('view:' + view);
 		},
+		redirect: function () {
+
+		},
 		locals: {},
 		json: function (data) {
 			this.send(JSON.stringify(data));
