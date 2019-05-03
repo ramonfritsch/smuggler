@@ -1,4 +1,6 @@
 # Smuggler
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Framonfritsch%2Fsmuggler.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Framonfritsch%2Fsmuggler?ref=badge_shield)
+
 
 > An expressjs middleware to handle with responses in an elegant way
 
@@ -47,3 +49,6 @@ app.get('/', function (req, res, next) {
 ---
 
 To be improved...
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Framonfritsch%2Fsmuggler.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Framonfritsch%2Fsmuggler?ref=badge_large)
